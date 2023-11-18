@@ -3,11 +3,13 @@ import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { Canvas, Layer, Rectangle, View } from "react-paper-bindings";
 import { io } from "socket.io-client";
-import { readEnv } from "~/utils/readEnv";
+import { env } from "../env.mjs";
 
 export default function Home() {
   const [color, setColor] = useState("red");
   const [roomId, setRoomId] = useState<string>("1234");
+  const [shape, setShape] = useState<any>(null);
+  const socket = io(env.NEXT_PUBLIC_API_ENDPOINT);
 
   const toggleColor = useCallback(() => {
     setColor(color === "red" ? "blue" : "red");
@@ -15,7 +17,7 @@ export default function Home() {
 
   const getRoomId = async () => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/getRoomId`,
+      `${env.NEXT_PUBLIC_API_ENDPOINT}/api/getRoomId`,
       {
         method: "GET",
         headers: {
@@ -28,7 +30,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const socket = io(readEnv("NEXT_PUBLIC_API_ENDPOINT"));
     socket.on("connect", () => {
       console.log("socket connected");
     });
@@ -39,6 +40,18 @@ export default function Home() {
       console.log("message received", message);
     });
 
+    // receive another draw event from the server
+    socket.on("draw", (data) => {
+      console.log("draw event received", data);
+    });
+
+    // Cleanup the socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     // whenever the user draws something, emit the event to the server
     socket.emit(
       "draw",
@@ -57,17 +70,7 @@ export default function Home() {
         console.log("draw event received", data);
       },
     );
-
-    // whenever another user draws something, update the canvas
-    socket.on("draw", (data) => {
-      console.log("draw event received", data);
-    });
-
-    // Cleanup the socket connection on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  }, [shape]);
 
   return (
     <>
