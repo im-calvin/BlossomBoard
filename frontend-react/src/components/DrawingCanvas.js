@@ -96,12 +96,15 @@ const DrawingCanvas = ({ username, room }) => {
   }, [paths]);
 
   return (
+    <>
+    <h1>Whiteboard++ Room: {room}</h1>
     <canvas
       ref={canvasRef}
       width={800}
       height={600}
       style={{ border: '1px solid black' }}
     />
+    </>
   );
 };
 

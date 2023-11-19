@@ -1,10 +1,12 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import json
+import random
+import string
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "http://localhost:3001"])
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Global state to store drawings for each room
@@ -13,6 +15,19 @@ drawings = {}
 @app.route("/")
 def hello_world():
     return "Hello, World!"
+
+@app.route('/api/rooms/verify/<room_code>', methods=['GET'])
+def verify_room(room_code):
+    print(f"Verifying room {room_code}")
+    exists = room_code in drawings
+    return jsonify({'exists': exists})
+
+@app.route('/api/rooms/create', methods=['POST'])
+def create_room():
+    print("Creating room")
+    room_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    drawings[room_code] = []  # Initialize empty drawings list for the room
+    return jsonify({'roomCode': room_code})
 
 @socketio.on("connect")
 def handle_connect():
