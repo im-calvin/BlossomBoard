@@ -2,75 +2,17 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { Canvas, Layer, Rectangle, View } from "react-paper-bindings";
-import { io } from "socket.io-client";
-import { env } from "../env.mjs";
+import DrawingCanvas from "~/components/DrawingCanvas";
+import { env } from "~/env.mjs";
 
 export default function Home() {
   const [color, setColor] = useState("red");
-  const [roomId, setRoomId] = useState<string>("1234");
-  const [shape, setShape] = useState<any>(null);
-  const socket = io(env.NEXT_PUBLIC_API_ENDPOINT);
+  const [room, setRoom] = useState<string>("1234");
+  const [username, setUsername] = useState<string>(
+    env.NEXT_PUBLIC_SECOND ? "user2" : "user1",
+  );
 
-  const toggleColor = useCallback(() => {
-    setColor(color === "red" ? "blue" : "red");
-  }, [color]);
-
-  const getRoomId = async () => {
-    const response = await fetch(
-      `${env.NEXT_PUBLIC_API_ENDPOINT}/api/getRoomId`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-    const roomId = (await response.json()) as string;
-    setRoomId(roomId);
-  };
-
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("socket connected");
-    });
-    socket.on("disconnect", () => {
-      console.log("socket disconnected");
-    });
-    socket.on("message", (message) => {
-      console.log("message received", message);
-    });
-
-    // receive another draw event from the server
-    socket.on("draw", (data) => {
-      console.log("draw event received", data);
-    });
-
-    // Cleanup the socket connection on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    // whenever the user draws something, emit the event to the server
-    socket.emit(
-      "draw",
-      {
-        roomId: roomId,
-        userId: "user1",
-        shape: {
-          x: 100,
-          y: 100,
-          width: 50,
-          height: 50,
-          color: "red",
-        },
-      },
-      (data) => {
-        console.log("draw event received", data);
-      },
-    );
-  }, [shape]);
+  console.log("username:", username);
 
   return (
     <>
@@ -93,10 +35,7 @@ export default function Home() {
               </Layer>
             </View>
           </Canvas> */}
-          <button onClick={getRoomId}>
-            <h2 className="text-2xl text-white">Create a Room</h2>
-          </button>
-          <h3 className="text-xl text-white">{"roomId:" + roomId}</h3>
+          <DrawingCanvas username={username} room={room} />
         </div>
       </main>
     </>

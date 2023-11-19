@@ -6,9 +6,7 @@ export const env = createEnv({
    * Specify your server-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars.
    */
-  server: {
-    NODE_ENV: z.enum(["development", "test", "production"]),
-  },
+  server: {},
 
   /**
    * Specify your client-side environment variables schema here. This way you can ensure the app
@@ -17,7 +15,10 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_API_ENDPOINT: z.string(),
+    NEXT_PUBLIC_NODE_ENV: z.enum(["development", "test", "production"]),
+    NEXT_PUBLIC_API_ENDPOINT_DEV: z.string(),
+    NEXT_PUBLIC_API_ENDPOINT_PROD: z.string(),
+    NEXT_PUBLIC_SECOND: z.boolean(),
   },
 
   /**
@@ -25,8 +26,10 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    NODE_ENV: process.env.NODE_ENV,
-    NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    NEXT_PUBLIC_NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_API_ENDPOINT_DEV: process.env.NEXT_PUBLIC_API_ENDPOINT_DEV,
+    NEXT_PUBLIC_API_ENDPOINT_PROD: process.env.NEXT_PUBLIC_API_ENDPOINT_PROD,
+    NEXT_PUBLIC_SECOND: Boolean(process.env.SECOND),
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

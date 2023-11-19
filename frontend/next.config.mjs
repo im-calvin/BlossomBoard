@@ -11,7 +11,7 @@ const config = {
     return [
       {
         // matching all API routes
-        source: "/api/:path*",
+        source: "/api/:path* /socket.io/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
@@ -32,7 +32,7 @@ const config = {
     ];
   },
   reactStrictMode: true,
-
+  distDir: process.env.SECOND == "false" ? ".next" : ".next2",
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
