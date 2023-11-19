@@ -9,10 +9,10 @@ export default function Home() {
   const [color, setColor] = useState("red");
   const [room, setRoom] = useState<string>("1234");
   const [username, setUsername] = useState<string>(
-    env.NEXT_PUBLIC_SECOND ? "user2" : "user1",
+    env.NEXT_PUBLIC_SECOND === "true" ? "user2" : "user1",
   );
 
-  console.log("username:", username);
+  console.log(username);
 
   return (
     <>

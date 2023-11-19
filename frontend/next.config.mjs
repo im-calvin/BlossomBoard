@@ -3,6 +3,7 @@
  * for Docker builds.
  */
 await import("./src/env.mjs");
+import { env } from "./src/env.mjs";
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -32,7 +33,7 @@ const config = {
     ];
   },
   reactStrictMode: true,
-  distDir: process.env.SECOND == "false" ? ".next" : ".next2",
+  distDir: process.env.NEXT_PUBLIC_SECOND === "false" ? ".next" : ".next2",
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
