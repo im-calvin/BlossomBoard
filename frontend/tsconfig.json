@@ -37,6 +37,6 @@
     "**/*.cjs",
     "**/*.mjs",
     ".next/types/**/*.ts"
-  ],
+, "src/components/DrawingCanvas.jsx"  ],
   "exclude": ["node_modules"]
 }

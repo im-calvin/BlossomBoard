@@ -1,49 +1,38 @@
 from flask import Flask, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
+from flask_socketio import SocketIO, emit, join_room, leave_room
 import json
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000, http://localhost:3001"])
+CORS(app, origins=["http://localhost:3000", "http://localhost:3001"])
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Global state to store drawings for each room
+drawings = {}
 
 @app.route("/")
 def hello_world():
     return "Hello, World!"
 
-
 @socketio.on("connect")
 def handle_connect():
     print(f"Client connected: {request.sid}")
-
 
 @socketio.on("disconnect")
 def handle_disconnect():
     print(f"Client disconnected: {request.sid}")
 
-
 @socketio.on("join")
 def on_join(data):
     username = data["username"]
     room = data["room"]
-    join_room(
-        room
-    )  # user joined is based on sessionId inherent to websocket request (request.sid)
+    join_room(room)
 
     print(f"{username} has joined room {room}")
-    print(f"Rooms: {rooms(request.sid)}")
-    send(
-        message={
-            "username": username,
-            "room": room,
-            "message": f"{username} has joined room {room}",
-        },
-        to=room,
-        include_self=False,
-        json=True,
-    )
 
+    if room in drawings:
+        emit("current_drawing", {"shapes": drawings[room]}, to=request.sid)
+    emit("join_announcement", {"username": username, "message": f"{username} has joined room {room}"}, to=room, include_self=False)
 
 @socketio.on("leave")
 def on_leave(data):
@@ -51,37 +40,18 @@ def on_leave(data):
     room = data["room"]
     leave_room(room)
     print(f"{username} has left room {room}")
-    print(f"Rooms: {rooms(request.sid)}")
-    send(
-        {
-            "username": username,
-            "room": room,
-            "message": f"{username} has left room {room}",
-        },
-        to=room,
-        include_self=False,
-        json=True,
-    )
-
 
 @socketio.on("draw")
 def handle_draw(data):
-    username = data["username"]  # original user who drew the shape
-    room = data["room"]  # room where the shape was drawn
-    shape = data["shape"]  # shape to be drawn
-    print(shape)
-    print(f"Received shape: {shape} from {username} in room {room}")
-    print(f"Rooms: {rooms(request.sid)}")
-    emit(
-        "draw",
-        {"shape": shape, "username": username},
-        to=room,
-        include_self=False,
-        json=True,
-        broadcast=True,
-        callback=lambda: print("Message sent!"),
-    )
+    username = data["username"]
+    room = data["room"]
+    shape = data["shape"]
+    if room not in drawings:
+        drawings[room] = []
+    drawings[room].append(shape)
 
+    print(f"Received shape: {shape} from {username} in room {room}")
+    emit("draw", {"shape": shape, "username": username}, to=room, include_self=False, json=True)
 
 if __name__ == "__main__":
     socketio.run(app=app, debug=True, host="0.0.0.0", port=8080)
