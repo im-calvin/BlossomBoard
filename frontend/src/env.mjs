@@ -18,7 +18,7 @@ export const env = createEnv({
     NEXT_PUBLIC_NODE_ENV: z.enum(["development", "test", "production"]),
     NEXT_PUBLIC_API_ENDPOINT_DEV: z.string(),
     NEXT_PUBLIC_API_ENDPOINT_PROD: z.string(),
-    NEXT_PUBLIC_SECOND: z.boolean(),
+    NEXT_PUBLIC_SECOND: z.enum(["true", "false"]),
   },
 
   /**
@@ -29,7 +29,7 @@ export const env = createEnv({
     NEXT_PUBLIC_NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_API_ENDPOINT_DEV: process.env.NEXT_PUBLIC_API_ENDPOINT_DEV,
     NEXT_PUBLIC_API_ENDPOINT_PROD: process.env.NEXT_PUBLIC_API_ENDPOINT_PROD,
-    NEXT_PUBLIC_SECOND: Boolean(process.env.SECOND),
+    NEXT_PUBLIC_SECOND: process.env.NEXT_PUBLIC_SECOND
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
