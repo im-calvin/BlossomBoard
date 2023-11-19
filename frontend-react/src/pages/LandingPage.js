@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { use } from 'bcrypt/promises';
 
 const LandingPage = () => {
   const [roomCode, setRoomCode] = useState('');
   const navigate = useNavigate();
+
+  const storedUsername = sessionStorage.getItem("username") || `User${Math.floor(Math.random() * 1000) + 1}`;
+  if (!sessionStorage.getItem("username")) {
+    sessionStorage.setItem("username", storedUsername);
+  }
 
   const handleJoinRoom = async () => {
     try {
       // Replace with your API endpoint to verify the room
       const response = await axios.get(`/api/rooms/verify/${roomCode}`);
       if (response.data.exists) {
-        navigate(`/home/${roomCode}`); // Navigate to Home with room code
+        navigate(`/home/${roomCode}`);
+        window.location.reload();
       } else {
         alert('Room does not exist');
       }
@@ -26,12 +33,16 @@ const LandingPage = () => {
       // Replace with your API endpoint to create a room
       const response = await axios.post('/api/rooms/create');
       const newRoomCode = response.data.roomCode;
-      navigate(`/home/${newRoomCode}`);      
+    //   navigate with reload 
+        navigate(`/home/${newRoomCode}`);
+        window.location.reload();
     } catch (error) {
       console.error('Error creating room:', error);
       alert('Error creating room');
     }
   };
+
+
 
   return (
     <div>

@@ -12,7 +12,7 @@ import logging
 
 app = Flask(__name__)
 # app.logger.setLevel(logging.WARNING)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
@@ -41,6 +41,10 @@ def create_room():
 def handle_connect():
     print(f"Client connected: {request.sid}")
 
+@socketio.on("connect_error")
+def handle_connect_error(err):
+    print(f"Client connection error: {err}")
+
 @socketio.on("disconnect")
 def handle_disconnect():
     # Remove the user from their room if they're in any
@@ -54,7 +58,8 @@ def handle_disconnect():
 def on_join(data):
     username = data["username"]
     room = data["room"]
-
+    print(f"{username} has joined room {room}")
+    # print(f"Room users: {room_users}")
     # Check if the user is already in another room
     for current_room in room_users:
         if username in room_users[current_room]:
@@ -64,7 +69,7 @@ def on_join(data):
                 del room_users[current_room][username]
 
                 # Optionally, send a message to the old room
-                emit("leave_announcement", {"username": username, "message": f"{username} has left room {current_room}"}, to=current_room)
+                emit("leave_announcement", {"username": username, "room": current_room}, to=current_room)
 
     # Join the new room
     join_room(room)
@@ -73,15 +78,18 @@ def on_join(data):
     if room not in room_users:
         room_users[room] = {}
     room_users[room][username] = request.sid
+    
+    # if nothing is in drawing for the room, initialize the room as empty list
+    if room not in drawings:
+        drawings[room] = []
 
     # Send current state of the room to the user
     if room in drawings:
         emit("current_drawing", {"shapes": drawings[room]}, to=request.sid)
 
     # Announce the user's arrival to the new room
-    print(f"{username} has joined room {room}")
-    print(f"Room users: {room_users}")
-    emit("join_announcement", {"username": username, "message": f"{username} has joined room {room}"}, to=room)
+
+    emit("join_announcement", {"username": username, "room": room}, to=room)
 
 
 @socketio.on("draw")
@@ -106,6 +114,11 @@ def on_leave(data):
 
     if room in room_users and username in room_users[room]:
         del room_users[room][username]
+        
+    # delete empty rooms
+    if room in room_users and len(room_users[room]) == 0:
+        del room_users[room]
+        del drawings[room]
 
     print(f"{username} has left room {room}")
     emit("leave_announcement", {"username": username, "message": f"{username} has left room {room}"}, to=room)

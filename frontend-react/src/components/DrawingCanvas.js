@@ -1,79 +1,64 @@
-import React, { useRef, useEffect, useState } from 'react';
-import paper from 'paper';
-import { socket } from '../socket';
+import React, { useRef, useEffect, useState } from "react";
+import paper from "paper";
+import { socket } from "../socket";
+import { useParams } from "react-router-dom";
 
-const DrawingCanvas = ({ room }) => {
+const DrawingCanvas = () => {
   const canvasRef = useRef(null);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [paths, setPaths] = useState([]);
-  const [username, setUsername] = useState('');
-  const [roomCode, setRoomCode] = useState(room);
+  const username = sessionStorage.getItem("username");
+  const { roomCode } = useParams();
+  // Create a mutable ref for roomCode
+  var roomCodeRef = useRef(roomCode);
 
   useEffect(() => {
-    console.log("isConnected:", isConnected);
-  }, [isConnected]);
+    console.log("roomcode ref is updated to: " + roomCode);
+    roomCodeRef.current = roomCode;
+  }, [roomCode]);
 
-  // Generate and store unique username
   useEffect(() => {
-    let storedUsername = sessionStorage.getItem('username');
-    if (!storedUsername) {
-      storedUsername = `User${Math.floor(Math.random() * 1000) + 1}`;
-      sessionStorage.setItem('username', storedUsername);
-    }
-    setUsername(storedUsername);
-    setRoomCode(room); // Update room code when room prop changes
-
     // Setup WebSocket connection
     const setupWebSocket = () => {
-      socket.emit('join', { username: storedUsername, room });
-
-      socket.on('connect', () => setIsConnected(true));
-      socket.on('disconnect', () => setIsConnected(false));
-      socket.on('current_drawing', (data) => {
-        if (data.shapes) {
-          setPaths(data.shapes);
+        socket.emit("join", { username, room: roomCode });
+        socket.on("connect", () => setIsConnected(true));
+        socket.on("disconnect", () => setIsConnected(false));
+        socket.on("current_drawing", (data) => {
+            if (data.shapes) {
+              setPaths(data.shapes);
+            }
+          });
+        socket.on("draw", (data) => {
+            if (data.username !== username) {
+              setPaths((prevPaths) => [...prevPaths, JSON.parse(data.shape)]);
+            }
+          });
         }
-      });
-      socket.on('draw', (data) => {
-        if (data.username !== storedUsername) {
-          setPaths((prevPaths) => [...prevPaths, JSON.parse(data.shape)]);
-        }
-      });
+      setupWebSocket();
+      
+      console.log("room is this: " + roomCode)
 
-      // Handle join and leave announcements
-      socket.on('join_announcement', (data) => {
-        console.log(data.message);
-        setRoomCode(data.room);
-      });
-      socket.on('leave_announcement', (data) => {
-        console.log(data.message);
-        setRoomCode(data.room);
-      });
+      return () => {
+        socket.emit("leave", { username: username, room: roomCode });
+        socket.off("connect");
+        socket.off("disconnect");
+        socket.off("current_drawing");
+        socket.off("draw");
+        socket.off("join_announcement");
+        socket.off("leave_announcement");
     };
 
-    setupWebSocket();
+  }, [roomCode]);
 
-    // Cleanup on component unmount
-    return () => {
-      socket.emit('leave', { username: storedUsername, room });
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('current_drawing');
-      socket.off('draw');
-      socket.off('join_announcement');
-      socket.off('leave_announcement');
-    };
-  }, [room]);
-
-  // Setup Paper.js and canvas
-  useEffect(() => {
+    // Update the roomCodeRef whenever roomCode changes
+    useEffect(() => {
     const canvas = canvasRef.current;
     paper.setup(canvas);
     const tool = new paper.Tool();
 
     tool.onMouseDown = (event) => {
       const path = new paper.Path();
-      path.strokeColor = 'black';
+      path.strokeColor = "black";
       path.add(event.point);
     };
 
@@ -83,13 +68,15 @@ const DrawingCanvas = ({ room }) => {
     };
 
     tool.onMouseUp = () => {
+      const currentRoomCode = roomCodeRef.current;
+      console.log("room is this: " + currentRoomCode, "username is this: " + username);
       const serializedPath = paper.project.activeLayer.lastChild.exportJSON();
-      socket.emit('draw', { username, room: roomCode, shape: serializedPath });
+      socket.emit("draw", { username, room: currentRoomCode, shape: serializedPath });
       setPaths((prevPaths) => [...prevPaths, serializedPath]);
     };
 
     return () => paper.project.clear();
-  }, [roomCode, paths]);
+  }, [username, paths, roomCode]);
 
   // Redraw canvas when paths change
   useEffect(() => {
@@ -103,7 +90,12 @@ const DrawingCanvas = ({ room }) => {
   return (
     <>
       <h1>Whiteboard++ Room: {roomCode}</h1>
-      <canvas ref={canvasRef} width={800} height={600} style={{ border: '1px solid black' }} />
+      <canvas
+        ref={canvasRef}
+        width={800}
+        height={600}
+        style={{ border: "1px solid black" }}
+      />
       {isConnected ? <p>Connected</p> : <p>Disconnected</p>}
     </>
   );
