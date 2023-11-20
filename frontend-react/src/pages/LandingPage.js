@@ -46,15 +46,68 @@ const LandingPage = () => {
 
   return (
     <div>
-      <h1>Whiteboard++</h1>
-      <input
-        type="text"
-        value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value)}
-        placeholder="Enter Room Code"
-      />
-      <button onClick={handleJoinRoom}>Join Room</button>
-      <button onClick={handleCreateRoom}>Create Room (random room code)</button>
+      <h1 style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        textAlign: 'center', 
+        background: 'linear-gradient(45deg, #9b59b6, #3498db)',
+        color: '#000033', 
+        padding: '20px', 
+        borderRadius: '8px'
+      }}>
+        <span style={{ color: '#ffffff' }}>Whiteboard++</span>
+        </h1>
+        <div style={{ textAlign: 'center', marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <input
+              type="text"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value)}
+              placeholder="Enter Room Code"
+              style={{ 
+                padding: '15px', 
+                borderRadius: '8px', 
+                border: '1px solid #ccc', 
+                color: '#e0e0e0',
+                fontSize: '16px',
+                marginBottom: '10px',
+                marginRight: '10px'
+              }}
+            />
+            <button
+              onClick={handleJoinRoom}
+              style={{ 
+                padding: '15px 30px', 
+                borderRadius: '8px', 
+                backgroundColor: '#3498db', // Green color
+                color: '#ffffff', 
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '16px',
+                marginTop: '50px' // Add margin between input and button
+              }}
+            >
+              Join Room
+            </button>
+          </div>
+          <button
+            onClick={handleCreateRoom}
+            style={{ 
+              padding: '15px 30px', 
+              borderRadius: '8px', 
+              backgroundColor: '#FFA500', // Blue color
+              color: '#ffffff', 
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              marginTop: '30px'
+            }}
+          >
+            Create Room (random room code)
+          </button>
+        </div>
+
     </div>
   );
 };

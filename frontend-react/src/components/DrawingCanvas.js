@@ -89,14 +89,28 @@ const DrawingCanvas = () => {
 
   return (
     <>
-      <h1>Whiteboard++ Room: {roomCode}</h1>
+      <h1 style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        textAlign: 'center', 
+        background: 'linear-gradient(45deg, #9b59b6, #3498db)',
+        color: '#000033', 
+        padding: '20px', 
+        borderRadius: '8px'
+      }}>
+        <span style={{ color: '#ffffff' }}>Whiteboard++</span>
+        <span>Room: {roomCode}</span>
+      </h1>
       <canvas
         ref={canvasRef}
-        width={800}
-        height={600}
-        style={{ border: "1px solid black" }}
+        width= "800" // Adjust as needed
+        height="600" // Adjust as needed
+        style={{ border: "1px solid black", margin: "20px auto", marginLeft: "20px" }}
       />
-      {isConnected ? <p>Connected</p> : <p>Disconnected</p>}
+
+
+      {isConnected ? <p style={{ color: 'green', fontWeight: 'bold', marginLeft: "20px" }}>Connected</p> : <p style={{ color: 'red', fontWeight: 'bold' }}>Disconnected</p>}
     </>
   );
 };
