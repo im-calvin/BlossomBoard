@@ -1,0 +1,64 @@
+.cell {
+    /* border: 1px solid black; */
+    /* display: flex; */
+    height: 100%;
+    width: 100%;
+    /* justify-content: center; */
+    /* align-items: center; */
+    resize: none;
+    border: 2px solid black;
+    border-radius: 0%;
+    margin: 10px;
+    font-size: large;
+    text-align: center;
+    vertical-align :middle;
+    display:inline-block;
+}
+
+.cell:focus {
+    outline: none;
+}
+
+.clusterContainer {
+    height: 95vh;
+    width: 95vh;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.cluster {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    justify-content: center;
+    align-items: center;
+    border: none;
+    margin: 5px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.cell::-webkit-scrollbar {
+    display: none;
+}
+  
+/* Hide scrollbar for IE, Edge and Firefox */
+.cell {
+-ms-overflow-style: none;  /* IE and Edge */
+scrollbar-width: none;  /* Firefox */
+}
+
+
+
+.active {
+    /* Styles for active clusters */
+}
+
+.inactive {
+    /* Styles for inactive clusters */
+    opacity: 0.5; /* Example: make inactive clusters semi-transparent */
+    pointer-events: none; /* Disables interactions */
+}

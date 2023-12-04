@@ -106,6 +106,21 @@ const LandingPage = () => {
           >
             Create Room (random room code)
           </button>
+
+          <button style={{ 
+              padding: '15px 30px', 
+              borderRadius: '8px', 
+              backgroundColor: '#FFA500', // Blue color
+              color: '#ffffff', 
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              marginTop: '30px'
+            }}>
+            <a href="/table" style={{ textDecoration: 'none', color: '#ffffff' }}>Go to Table Room</a>
+          </button>
+
+
         </div>
 
     </div>
