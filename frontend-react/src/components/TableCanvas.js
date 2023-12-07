@@ -199,7 +199,7 @@ const TableHome = () => {
             </Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
-              <Navbar.Text>
+              <Navbar.Text className="text-white">
                 Room Code : {roomCode} <span className="mx-2">  </span>
                 <Button variant="primary" onClick={() => setModalShow(true)}>
                   Share
