@@ -148,45 +148,16 @@ const LandingPage = () => {
             marginTop: "30px",
           }}
         >
-          Create Room (random room code)
+          Create Drawing Room (random room code)
         </button>
 
 
 
+          <div style={{ marginTop: "30px" }}>
+            OR
+          </div>
 
 
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            type="text"
-            value={tableCode}
-            onChange={(e) => setTableCode(e.target.value)}
-            placeholder="Enter Room Code"
-            style={{
-              padding: "15px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              color: "#e0e0e0",
-              fontSize: "16px",
-              marginBottom: "10px",
-              marginRight: "10px",
-            }}
-          />
-          <button
-            onClick={handleJoinTable}
-            style={{
-              padding: "15px 30px",
-              borderRadius: "8px",
-              backgroundColor: "#3498db", // Green color
-              color: "#ffffff",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "16px",
-              marginTop: "50px", // Add margin between input and button
-            }}
-          >
-            Join Table
-          </button>
-        </div>
         <button
           style={{
             padding: "15px 30px",

@@ -179,7 +179,7 @@ const TableHome = () => {
     }
 
     // Emit the change to socket if needed
-    socket.emit("cellChange", { row, col, value, room: roomCode });
+    // socket.emit("cellChange", { row, col, value, room: roomCode });
   };
 
   const getMiddleCellValue = (clusterIndex) => {
