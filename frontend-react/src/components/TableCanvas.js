@@ -194,7 +194,7 @@ const TableHome = () => {
     <>
     <Navbar className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
           <Container>
-            <Navbar.Brand href="/">
+            <Navbar.Brand href="/" className="text-white font-weight-bold text-uppercase px-3">
               Lotus Blossom Board 
             </Navbar.Brand>
             <Navbar.Toggle />
@@ -203,6 +203,10 @@ const TableHome = () => {
                 Room Code : {roomCode} <span className="mx-2">  </span>
                 <Button variant="primary" onClick={() => setModalShow(true)}>
                   Share
+                </Button>
+                <span className="mx-2">  </span>
+                <Button variant="danger" onClick={() => window.location.href = "/"}>
+                    Exit
                 </Button>
               </Navbar.Text>
               
