@@ -20,6 +20,10 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 drawings = {}
 room_users = {}  # Structure: { 'roomCode': {'username1', 'username2', ...} }
 
+blossom_table = {}
+table_rooms = {} # Structure: { 'roomCode': {'username1', 'username2', ...} }
+
+
 @app.route("/")
 def hello_world():
     return "Hello, World!"
@@ -30,12 +34,26 @@ def verify_room(room_code):
     exists = room_code in drawings
     return jsonify({'exists': exists})
 
+@app.route('/api/tables/verify/<table_room_code>', methods=['GET'])
+def verify_table_room(table_room_code):
+    print(f"Verifying table room {table_room_code}")
+    exists = table_room_code in blossom_table
+    return jsonify({'exists': exists})
+
 @app.route('/api/rooms/create', methods=['POST'])
 def create_room():
     print("Creating room")
     room_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     drawings[room_code] = []  # Initialize empty drawings list for the room
     return jsonify({'roomCode': room_code})
+
+@app.route('/api/tables/create', methods=['POST'])
+def create_table_room():
+    print("Creating table room")
+    table_room_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    blossom_table[table_room_code] = []  # Initialize empty table for the room
+    table_rooms[table_room_code] = {}  # Initialize empty user list for the room
+    return jsonify({'tableCode': table_room_code})
 
 @socketio.on("connect")
 def handle_connect():
@@ -123,6 +141,24 @@ def on_leave(data):
     print(f"{username} has left room {room}")
     emit("leave_announcement", {"username": username, "message": f"{username} has left room {room}"}, to=room)
 
+
+@socketio.on('cellChange')
+def handle_cell_change(data):
+    row = data['row']
+    col = data['col']
+    value = data['value']
+    room = data['room']
+    print(f"Received cell change event from {room} at ({row}, {col}), value {value}")
+
+    # Update the global state (e.g., blossom_table)
+    if room in blossom_table:
+        if 'cells' not in blossom_table[room]:
+            blossom_table[room]['cells'] = [[None]*9 for _ in range(9)]
+        blossom_table[room]['cells'][row][col] = value
+
+    # Broadcast the update to all clients in the room
+    emit('cellUpdate', {'row': row, 'col': col, 'value': value}, room=room)
+    
 # Other event handlers remain the same
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-.cell {
+.cellCustom {
     /* border: 1px solid black; */
     /* display: flex; */
     height: 100%;
@@ -13,40 +13,46 @@
     text-align: center;
     vertical-align :middle;
     display:inline-block;
+    box-sizing:initial;
+    font-family: inherit;
 }
 
-.cell:focus {
+.cellCustom:focus {
     outline: none;
 }
 
 .clusterContainer {
-    height: 95vh;
-    width: 95vh;
+    padding-top: 10px;
+    height: 100%;
+    aspect-ratio: 1 / 1;
     min-width: 0;
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 20px;
+    /* overflow-x: scroll; */
 }
 
 .cluster {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows:  repeat(3, 1fr);
     justify-content: center;
     align-items: center;
     border: none;
-    margin: 5px;
+    /* margin: 5px; */
+    height: 90%;   
+    aspect-ratio: 1 / 1;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
-.cell::-webkit-scrollbar {
+.cellCustom::-webkit-scrollbar {
     display: none;
 }
   
 /* Hide scrollbar for IE, Edge and Firefox */
-.cell {
+.cellCustom {
 -ms-overflow-style: none;  /* IE and Edge */
 scrollbar-width: none;  /* Firefox */
 }

@@ -20,38 +20,37 @@ const DrawingCanvas = () => {
   useEffect(() => {
     // Setup WebSocket connection
     const setupWebSocket = () => {
-        socket.emit("join", { username, room: roomCode });
-        socket.on("connect", () => setIsConnected(true));
-        socket.on("disconnect", () => setIsConnected(false));
-        socket.on("current_drawing", (data) => {
-            if (data.shapes) {
-              setPaths(data.shapes);
-            }
-          });
-        socket.on("draw", (data) => {
-            if (data.username !== username) {
-              setPaths((prevPaths) => [...prevPaths, JSON.parse(data.shape)]);
-            }
-          });
+      socket.emit("join", { username, room: roomCode });
+      socket.on("connect", () => setIsConnected(true));
+      socket.on("disconnect", () => setIsConnected(false));
+      socket.on("current_drawing", (data) => {
+        if (data.shapes) {
+          setPaths(data.shapes);
         }
-      setupWebSocket();
-      
-      console.log("room is this: " + roomCode)
-
-      return () => {
-        socket.emit("leave", { username: username, room: roomCode });
-        socket.off("connect");
-        socket.off("disconnect");
-        socket.off("current_drawing");
-        socket.off("draw");
-        socket.off("join_announcement");
-        socket.off("leave_announcement");
+      });
+      socket.on("draw", (data) => {
+        if (data.username !== username) {
+          setPaths((prevPaths) => [...prevPaths, JSON.parse(data.shape)]);
+        }
+      });
     };
+    setupWebSocket();
 
+    console.log("room is this: " + roomCode);
+
+    return () => {
+      socket.emit("leave", { username: username, room: roomCode });
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("current_drawing");
+      socket.off("draw");
+      socket.off("join_announcement");
+      socket.off("leave_announcement");
+    };
   }, [roomCode]);
 
-    // Update the roomCodeRef whenever roomCode changes
-    useEffect(() => {
+  // Update the roomCodeRef whenever roomCode changes
+  useEffect(() => {
     const canvas = canvasRef.current;
     paper.setup(canvas);
     const tool = new paper.Tool();
@@ -69,9 +68,16 @@ const DrawingCanvas = () => {
 
     tool.onMouseUp = () => {
       const currentRoomCode = roomCodeRef.current;
-      console.log("room is this: " + currentRoomCode, "username is this: " + username);
+      console.log(
+        "room is this: " + currentRoomCode,
+        "username is this: " + username
+      );
       const serializedPath = paper.project.activeLayer.lastChild.exportJSON();
-      socket.emit("draw", { username, room: currentRoomCode, shape: serializedPath });
+      socket.emit("draw", {
+        username,
+        room: currentRoomCode,
+        shape: serializedPath,
+      });
       setPaths((prevPaths) => [...prevPaths, serializedPath]);
     };
 
@@ -89,28 +95,39 @@ const DrawingCanvas = () => {
 
   return (
     <>
-      <h1 style={{ 
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        textAlign: 'center', 
-        background: 'linear-gradient(45deg, #9b59b6, #3498db)',
-        color: '#000033', 
-        padding: '20px', 
-        borderRadius: '8px'
-      }}>
-        <span style={{ color: '#ffffff' }}>Whiteboard++</span>
+      <h1
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          textAlign: "center",
+          background: "linear-gradient(45deg, #9b59b6, #3498db)",
+          color: "#000033",
+          padding: "20px",
+          borderRadius: "8px",
+        }}
+      >
+        <span style={{ color: "#ffffff" }}>Whiteboard++</span>
         <span>Room: {roomCode}</span>
       </h1>
       <canvas
         ref={canvasRef}
-        width= "800" // Adjust as needed
+        width="800" // Adjust as needed
         height="600" // Adjust as needed
-        style={{ border: "1px solid black", margin: "20px auto", marginLeft: "20px" }}
+        style={{
+          border: "1px solid black",
+          margin: "20px auto",
+          marginLeft: "20px",
+        }}
       />
 
-
-      {isConnected ? <p style={{ color: 'green', fontWeight: 'bold', marginLeft: "20px" }}>Connected</p> : <p style={{ color: 'red', fontWeight: 'bold' }}>Disconnected</p>}
+      {isConnected ? (
+        <p style={{ color: "green", fontWeight: "bold", marginLeft: "20px" }}>
+          Connected
+        </p>
+      ) : (
+        <p style={{ color: "red", fontWeight: "bold" }}>Disconnected</p>
+      )}
     </>
   );
 };
